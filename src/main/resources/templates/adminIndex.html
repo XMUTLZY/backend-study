@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <title>教学管理系统</title>
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}">
+    <link rel="stylesheet" th:href="@{/layui/css/layui.template.css}">
+    <link rel="stylesheet" th:href="@{/css/admin2.css}" media="all">
+    <link rel="shortcut icon" th:href="@{/layui/images/face/65.gif}"/>
+    <script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/layui/laydate/laydate.js}"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=g8oPktpkZFFZFOapLjvBmWpW5RNjKaq7"></script>
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo">教学管理系统</div>
+        <input type="hidden" id="role" th:value="${admin.role}">
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item">
+                <a th:text="${admin.accountName}"></a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <ul class="layui-nav layui-nav-tree" lay-filter="">
+                <li class="layui-nav-item">
+                    <a onclick="adminIndexJs.event.questionList();">题目管理</a>
+                </li>
+                <li class="layui-nav-item">
+                    <a onclick="adminIndexJs.method.studentList();">学生管理</a>
+                </li>
+                <li class="layui-nav-item" id="admin-tab">
+                    <a onclick="adminIndexJs.method.adminList();">管理员管理</a>
+                </li>
+                <li class="layui-nav-item">
+                    <a onclick="adminIndexJs.method.answerList();">答题情况</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="layui-body">
+        <!-- 题目管理 -->
+        <div class="layui-hide" style="padding: 15px;" id="question-list">
+            <button class="layui-btn" onclick="adminIndexJs.method.addQuestionDialog();">
+                <i class="layui-icon">&#xe608;</i> 新增题目
+            </button>
+            <table id="question-list-table" lay-filter="question-list-table-fit"></table>
+            <script type="text/html" id="question-list-table-operate">
+                <a class="layui-btn layui-btn-sm layui-btn-normal" lay-event="edit">修改</a>
+                <a class="layui-btn layui-btn-sm layui-btn-danger" lay-event="del">删除</a>
+            </script>
+        </div>
+        <!-- 学生管理 -->
+        <div class="layui-hide" style="padding: 15px;" id="student-list">
+            <button class="layui-btn" id="import-student-btn">
+                <i class="layui-icon">&#xe608;</i> 导入学生名单
+            </button>
+            <table id="student-list-table" lay-filter="student-list-table-fit"></table>
+        </div>
+        <!-- 管理员管理 -->
+        <div class="layui-hide" style="padding: 15px;" id="admin-list">
+            <button class="layui-btn" onclick="adminIndexJs.method.addAdminDialog();">
+                <i class="layui-icon">&#xe608;</i> 添加管理员
+            </button>
+            <table id="admin-list-table" lay-filter="admin-list-table-fit"></table>
+            <script type="text/html" id="admin-list-table-operate">
+                <a class="layui-btn layui-btn-sm layui-btn-normal" lay-event="edit">修改</a>
+                <a class="layui-btn layui-btn-sm layui-btn-danger" lay-event="del">删除</a>
+            </script>
+        </div>
+        <!-- 答题情况 -->
+        <div class="layui-hide" style="padding: 15px;" id="answer-list">
+            <button class="layui-btn" id="export-answer-btn" onclick="adminIndexJs.method.exportAnswerList();">
+                <i class="layui-icon">&#xe608;</i> 导出学生答题情况
+            </button>
+            <table id="answer-list-table" lay-filter="answer-list-table-fit"></table>
+        </div>
+    </div>
+    <div class="layui-footer">
+        © 教学管理系统
+    </div>
+</div>
+<div id="dialog-edit-question-info" style="display: none;">
+    <div class="pgc-questionManagement">
+        <div class="layui-form filter-wrap">
+            <div class="layui-form-item">
+                <label class="layui-form-label">编号:</label>
+                <div class="layui-input-inline" style="width: 320px">
+                    <input id="edit-id" disabled="disabled" class="layui-input" value=""/>
+                </div>
+                <div class="layui-form-mid layui-word-aux" style='color: red;'>无法更改</div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">科目(如果为添加，则设置科目id):</label>
+                <div class="layui-input-inline" style="width: 320px">
+                    <input id="edit-project" disabled="disabled" class="layui-input" value=""/>
+                </div>
+                <div class="layui-form-mid layui-word-aux" style='color: red;'>无法更改</div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">题目:</label>
+                <div class="layui-input-inline" style="width: 320px">
+                    <input id="edit-question-text" type="text" class="layui-input" value=""/>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">A选项:</label>
+                <div class="layui-input-inline" style="width: 320px">
+                    <input id="edit-answer-a" type="text" class="layui-input" value=""/>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">B选项:</label>
+                <div class="layui-input-inline" style="width: 320px">
+                    <input id="edit-answer-b" type="text" class="layui-input" value=""/>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">C选项:</label>
+                <div class="layui-input-inline" style="width: 320px">
+                    <input id="edit-answer-c" type="text" class="layui-input" value=""/>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">D选项:</label>
+                <div class="layui-input-inline" style="width: 320px">
+                    <input id="edit-answer-d" type="text" class="layui-input" value=""/>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">正确答案:</label>
+                <div class="layui-input-inline" style="width: 320px">
+                    <input id="edit-correct-answer" type="text" class="layui-input" value=""/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="dialog-add-question-info" style="display: none;">
+    <div class="pgc-questionManagement">
+        <div class="layui-form filter-wrap">
+            <div class="layui-form-item">
+                <label class="layui-form-label">科目:</label>
+                <div class="layui-inline">
+                    <select name="add-project" id="add-project">
+                        <option value="">请选择</option>
+                        <option value="1">数学</option>
+                        <option value="2">语文</option>
+                        <option value="3">英语</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">题目:</label>
+                <div class="layui-input-inline" style="width: 320px">
+                    <input id="add-question-text" type="text" class="layui-input" value=""/>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">A选项:</label>
+                <div class="layui-input-inline" style="width: 320px">
+                    <input id="add-answer-a" type="text" class="layui-input" value=""/>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">B选项:</label>
+                <div class="layui-input-inline" style="width: 320px">
+                    <input id="add-answer-b" type="text" class="layui-input" value=""/>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">C选项:</label>
+                <div class="layui-input-inline" style="width: 320px">
+                    <input id="add-answer-c" type="text" class="layui-input" value=""/>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">D选项:</label>
+                <div class="layui-input-inline" style="width: 320px">
+                    <input id="add-answer-d" type="text" class="layui-input" value=""/>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">正确答案:</label>
+                <div class="layui-input-inline" style="width: 320px">
+                    <input id="add-correct-answer" type="text" class="layui-input" value=""/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="dialog-edit-admin-info" style="display: none;">
+    <div class="pgc-questionManagement">
+        <div class="layui-form filter-wrap">
+            <div class="layui-form-item">
+                <label class="layui-form-label">编号:</label>
+                <div class="layui-input-inline" style="width: 320px">
+                    <input id="edit-admin-id" disabled="disabled" class="layui-input" value=""/>
+                </div>
+                <div class="layui-form-mid layui-word-aux" style='color: red;'>无法更改</div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">管理员名称:</label>
+                <div class="layui-input-inline" style="width: 320px">
+                    <input id="edit-username" type="text" class="layui-input" value=""/>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">管理员密码（修改时填明文）:</label>
+                <div class="layui-input-inline" style="width: 320px">
+                    <input id="edit-password" type="text" class="layui-input" value=""/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="dialog-add-admin-info" style="display: none;">
+    <div class="pgc-questionManagement">
+        <div class="layui-form filter-wrap">
+            <div class="layui-form-item">
+                <label class="layui-form-label">编号:</label>
+                <div class="layui-input-inline" style="width: 320px">
+                    <input id="add-admin-id" disabled="disabled" class="layui-input" value=""/>
+                </div>
+                <div class="layui-form-mid layui-word-aux" style='color: red;'>无法更改</div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">管理员名称:</label>
+                <div class="layui-input-inline" style="width: 320px">
+                    <input id="add-username" type="text" class="layui-input" value=""/>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">管理员密码（明文）:</label>
+                <div class="layui-input-inline" style="width: 320px">
+                    <input id="add-password" type="text" class="layui-input" value=""/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/layui/layui.all.js}"></script>
+<script type="text/javascript" th:src="@{/js/adminIndexJs.js}"></script>
+</body>
+</html>

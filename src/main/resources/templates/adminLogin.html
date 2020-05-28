@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.springframework.org/schema/data/jaxb">
+<head>
+    <meta charset="utf-8">
+    <title>登录 - 教学管理系统</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/admin.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/login.css}" media="all">
+    <link rel="shortcut icon" th:href="@{/layui/images/face/65.gif}"/>
+    <script th:src="@{/js/jquery.min.js}"></script>
+</head>
+<body>
+<script th:src="@{/layui/layui.all.js}"></script>
+<script>
+    $(document).ready(function () {
+        //登录操作
+        $(".layui-btn-fluid").click(function () {
+            var data = {};
+            data.account_name = $("#account-name").val();
+            data.password = $("#password").val();
+            $.ajax({
+                url: '../admin/login',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                type: 'post',
+                success: function (result) {
+                    if (result.status_code == 200) {
+                        setTimeout(function () {
+                            location.href = "../view/index";
+                        },1000)
+                    } else {
+                        layer.msg(result.message);
+                    }
+                },
+                error: function () {
+                    layer.msg('数据请求异常');
+                }
+            })
+        })
+    })
+</script>
+<div class="layadmin-user-login layadmin-user-display-show" id="LAY-user-login" style="display: none;">
+
+    <div class="layadmin-user-login-main">
+        <div class="layadmin-user-login-box layadmin-user-login-header">
+            <h2>登录</h2>
+            <p>教学管理系统登录</p>
+        </div>
+        <div class="layadmin-user-login-box layadmin-user-login-body layui-form">
+            <div class="layui-form-item">
+                <label class="layadmin-user-login-icon layui-icon layui-icon-username"></label>
+                <input type="text" id="account-name" lay-verify="required" placeholder="管理员名称"
+                       class="layui-input">
+            </div>
+            <div class="layui-form-item">
+                <label class="layadmin-user-login-icon layui-icon layui-icon-password"></label>
+                <input type="text" id="password" lay-verify="required"
+                       placeholder="管理员密码" class="layui-input">
+            </div>
+            <div class="layui-form-item">
+                <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="LAY-user-reg-submit">登 录</button>
+            </div>
+            <div class="layui-trans layui-form-item layadmin-user-login-other">
+                <label>社交账号登入</label>
+                <a href="javascript:;"><i class="layui-icon layui-icon-login-qq"></i></a>
+                <a href="javascript:;"><i class="layui-icon layui-icon-login-wechat"></i></a>
+                <a href="javascript:;"><i class="layui-icon layui-icon-login-weibo"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-trans layadmin-user-login-footer">
+
+        <p>© 2019 <a href="#" target="_blank">xmut</a></p>
+        <p>
+            <span><a href="../userView/login">用户登录</a></span>
+            <span><a href="#" target="_blank">在线演示</a></span>
+            <span><a href="#" target="_blank">前往官网</a></span>
+        </p>
+    </div>
+
+</div>
+</body>
+</html>
